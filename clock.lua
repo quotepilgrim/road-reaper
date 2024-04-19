@@ -6,18 +6,18 @@ function Clock:load()
     setmetatable(self, Clock)
     self.x = 0
     self.y = 0
-    self.sprite=love.graphics.newImage("assets/clock.png")
-    self.width=self.sprite:getWidth()
-    self.height=self.sprite:getHeight()
+    self.sprite = love.graphics.newImage("assets/clock.png")
+    self.width = self.sprite:getWidth()
+    self.height = self.sprite:getHeight()
     self.state = "hidden"
     self.states = {
         visible = {},
-        hidden = {}
+        hidden = {},
     }
     self.timer = 3
     self.place = {
-        x = {100,300,500,700},
-        y = {32, 200, 364}
+        x = { 100, 280, 520, 700 },
+        y = { 32, 200, 364, 532 },
     }
     self.collect_sound = love.audio.newSource("assets/collect_clock.wav", "static")
 
@@ -46,7 +46,6 @@ function Clock:load()
     return self
 end
 
-
 function Clock:update(dt)
     self.states[self.state].update(dt)
 end
@@ -56,13 +55,20 @@ function Clock:draw()
 end
 
 function Clock:spawn()
-    self.x = self.place.x[math.random(1, #self.place.x)]
-    self.y = self.place.y[math.random(1, #self.place.y)]
-    self.timer = 2
+    local x = math.random(1, #self.place.x)
+    local y
+    if x > 1 and x < #self.place.x then
+        y = math.random(1, #self.place.y)
+    else
+        y = math.random(1, #self.place.y - 1)
+    end
+    self.x = self.place.x[x]
+    self.y = self.place.y[y]
+    self.timer = 2.25
     self.state = "visible"
 end
 
 function Clock:hide()
-    self.timer = math.random(4, 10)/2
+    self.timer = math.random(4, 10) / 2
     self.state = "hidden"
 end

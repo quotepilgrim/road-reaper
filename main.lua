@@ -1,9 +1,9 @@
-require "player"
-require "car"
-require "mob"
-require "clock"
+require("player")
+require("car")
+require("mob")
+require("clock")
 
-local push = require "lib.push"
+local push = require("lib.push")
 
 local delay, timer, key_pressed
 local score_height, time_width, header_height, body_width, body_height, line
@@ -13,8 +13,8 @@ local small_font = love.graphics.newFont(24)
 local big_font = love.graphics.newFont(32)
 
 local width, height = 800, 600
-local window_width = select(1,love.window.getDesktopDimensions())
-local window_height = select(2,love.window.getDesktopDimensions())
+local window_width = select(1, love.window.getDesktopDimensions())
+local window_height = select(2, love.window.getDesktopDimensions())
 local player, cars, mobs, clock
 local bg = love.graphics.newImage("assets/bg.png")
 local beepbeep = love.audio.newSource("assets/beepbeep.wav", "static")
@@ -23,30 +23,30 @@ local screen = "title"
 local screens = {
     title = {},
     main = {},
-    game_over = {}
+    game_over = {},
 }
 
 local function load_objects()
-    player = Player:load{x=400, y=535, width=24, height=24}
+    player = Player:load({ x = 400, y = 535, width = 24, height = 24 })
     timer = 15
 
-    player.x = player.x -player.width/2
+    player.x = player.x - player.width / 2
 
     mobs = {
-        Mob:load{x=100, y=-50},
-        Mob:load{x=250, y=-50},
-        Mob:load{x=400, y=-50},
-        Mob:load{x=550, y=-50},
-        Mob:load{x=700, y=-50},
+        Mob:load({ x = 100, y = -50 }),
+        Mob:load({ x = 250, y = -50 }),
+        Mob:load({ x = 400, y = -50 }),
+        Mob:load({ x = 550, y = -50 }),
+        Mob:load({ x = 700, y = -50 }),
     }
 
     cars = {
-        Car:load{x=0, y=94},
-        Car:load{x=0, y=144, speed=-1},
-        Car:load{x=0, y=258},
-        Car:load{x=0, y=306, speed=-1},
-        Car:load{x=0, y=420},
-        Car:load{x=0, y=470, speed=-1},
+        Car:load({ x = 0, y = 94 }),
+        Car:load({ x = 0, y = 144, speed = -1 }),
+        Car:load({ x = 0, y = 258 }),
+        Car:load({ x = 0, y = 306, speed = -1 }),
+        Car:load({ x = 0, y = 420 }),
+        Car:load({ x = 0, y = 470, speed = -1 }),
     }
 
     clock = Clock:load()
@@ -58,7 +58,7 @@ local function load_objects()
     end
 
     for i in pairs(mobs) do
-        mobs[i].x = mobs[i].x - mobs[i].width/2
+        mobs[i].x = mobs[i].x - mobs[i].width / 2
         mobs[i]:randomize_speed()
     end
 end
@@ -93,29 +93,25 @@ function screens.title.update(dt)
 end
 
 function screens.title.draw()
-
     controls_text.body:set(control_strings.wasd)
     header_height = controls_text.header:getHeight()
     body_width, body_height = controls_text.body:getDimensions()
 
     line = 160
-    love.graphics.draw(
-        title_text, 400, line, 0, 1, 1, title_text:getWidth()/2, header_height)
+    love.graphics.draw(title_text, 400, line, 0, 1, 1, title_text:getWidth() / 2, header_height)
 
     line = line + 100
-    love.graphics.draw(controls_text.header, 400-body_width/2, line, 0, 1, 1)
+    love.graphics.draw(controls_text.header, 400 - body_width / 2, line, 0, 1, 1)
 
     line = line + header_height * 1.6
-    love.graphics.draw(controls_text.body, 400, line, 0, .8, .8, body_width/2)
+    love.graphics.draw(controls_text.body, 400, line, 0, 0.8, 0.8, body_width / 2)
 
     controls_text.body:set(control_strings.escape)
 
     line = line + body_height * 1.2
-    love.graphics.draw(controls_text.body, 400, line, 0, .8, .8, body_width/2)
+    love.graphics.draw(controls_text.body, 400, line, 0, 0.8, 0.8, body_width / 2)
 
-    love.graphics.draw(
-        start_text, 400, 500, 0, .8, .8, start_text:getWidth()/2
-    )
+    love.graphics.draw(start_text, 400, 500, 0, 0.8, 0.8, start_text:getWidth() / 2)
 end
 
 -- main screen --
@@ -123,19 +119,22 @@ end
 function screens.main.update(dt)
     player:update(dt)
     clock:update(dt)
-    score_text:set("Score: "..player.score)
+    score_text:set("Score: " .. player.score)
 
     timer = timer - dt
 
     if timer < 5 then
-        time_color = {1, .4, .3}
+        time_color = { 1, 0.4, 0.3 }
         beepbeep:play()
     else
-        time_color = {1, 1, 1}
+        time_color = { 1, 1, 1 }
     end
 
     time_text:set({
-        {1,1,1}, "Time: ", time_color, string.format("%.2f", timer)
+        { 1, 1, 1 },
+        "Time: ",
+        time_color,
+        string.format("%.2f", timer),
     })
 
     if timer < 0 then
@@ -193,8 +192,8 @@ function screens.main.draw()
         mobs[i]:draw()
     end
 
-    love.graphics.draw(score_text, 10, height-10, 0, .8, .8, 0, score_height)
-    love.graphics.draw(time_text, width-10, height-10, 0, .8, .8, time_width, score_height)
+    love.graphics.draw(score_text, 10, height - 10, 0, 0.8, 0.8, 0, score_height)
+    love.graphics.draw(time_text, width - 10, height - 10, 0, 0.8, 0.8, time_width, score_height)
 
     player:draw()
 end
@@ -203,22 +202,17 @@ end
 
 function screens.game_over.update(dt)
     delay = delay + dt
-    if key_pressed and delay > .5 then
-        reset(); load_objects()
+    if key_pressed and delay > 0.5 then
+        reset()
+        load_objects()
         screen = "main"
     end
 end
 
 function screens.game_over.draw()
-    love.graphics.draw(
-        game_over_text, 400, 200, 0, 1, 1,
-        game_over_text:getWidth()/2, game_over_text:getHeight()
-    )
-    love.graphics.draw(score_text, 400, 250, 0, 1, 1, score_text:getWidth()/2)
-    love.graphics.draw(
-        restart_text, 400, 450, 0, .8, .8,
-        restart_text:getWidth()/2
-    )
+    love.graphics.draw(game_over_text, 400, 200, 0, 1, 1, game_over_text:getWidth() / 2, game_over_text:getHeight())
+    love.graphics.draw(score_text, 400, 250, 0, 1, 1, score_text:getWidth() / 2)
+    love.graphics.draw(restart_text, 400, 450, 0, 0.8, 0.8, restart_text:getWidth() / 2)
 end
 
 ----------------
@@ -228,33 +222,26 @@ end
 function love.load()
     window_width, window_height = window_width * 0.8, window_height * 0.8
     if window_height >= window_width then
-        window_height = 3/4 * window_width
+        window_height = 3 / 4 * window_width
     else
-        window_width = 4/3 * window_height
+        window_width = 4 / 3 * window_height
     end
 
-    push:setupScreen(
-        width, height, window_width, window_height,
-        {resizable=true, canvas=false}
-    )
+    push:setupScreen(width, height, window_width, window_height, { resizable = true, canvas = false })
 
     title_text = love.graphics.newText(big_font, "Road Reaper")
-    start_text = love.graphics.newText(
-        small_font,{{.5, .5, .5},"Press any key to begin."}
-    )
+    start_text = love.graphics.newText(small_font, { { 0.5, 0.5, 0.5 }, "Press any key to begin." })
     controls_text = {
         header = love.graphics.newText(small_font, "Controls:"),
-        body = love.graphics.newText(small_font,""),
+        body = love.graphics.newText(small_font, ""),
     }
     control_strings = {
         wasd = "W, A, S, D or arrow keys to move",
-        escape = "Escape to exit"
-        }
+        escape = "Escape to exit",
+    }
     score_text = love.graphics.newText(small_font, "Score")
     time_text = love.graphics.newText(small_font, "Time: 99.99")
-    restart_text = love.graphics.newText(
-        small_font, {{.5, .5, .5}, "Press any key to restart."}
-    )
+    restart_text = love.graphics.newText(small_font, { { 0.5, 0.5, 0.5 }, "Press any key to restart." })
     game_over_text = love.graphics.newText(big_font, "Game Over")
     score_height = score_text:getHeight()
     time_width = time_text:getWidth()

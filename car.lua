@@ -16,16 +16,14 @@ function Car:load(params)
         love.graphics.newImage("assets/car_magenta.png"),
     }
     self:set_sprite()
-    self.width=self.sprite:getWidth()
-    self.height=self.sprite:getHeight()
+    self.width = self.sprite:getWidth()
+    self.height = self.sprite:getHeight()
     return self
 end
 
 function Car:update(dt)
     self.x = self.x + self.speed * dt
-    if self.speed > 0 and self.x > 800 or 
-       self.speed < 0 and self.x < -self.width
-    then
+    if self.speed > 0 and self.x > 800 or self.speed < 0 and self.x < -self.width then
         self:reset()
     end
 end
@@ -40,12 +38,12 @@ end
 
 function Car:reset()
     self:set_sprite()
-    local speed = math.random(3, 12) * 50
+    local speed = math.random(3, 12) * 45
     if self.speed > 0 then
-        self.x = -self.width*3
+        self.x = -self.width * 3
     else
         speed = -speed
-        self.x = 800 + self.width*2
+        self.x = 800 + self.width * 2
     end
     self.speed = speed
 end
@@ -53,3 +51,4 @@ end
 function Car:set_sprite()
     self.sprite = self.sprites[math.random(1, #self.sprites)]
 end
+
