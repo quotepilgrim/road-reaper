@@ -259,7 +259,7 @@ function love.draw()
     push:finish()
 end
 
---- *** ---
+---
 
 function love.resize(w, h)
     return push:resize(w, h)

@@ -13,11 +13,6 @@ function Mob:load(params)
     self:set_sprite("mob")
     self.speed = params.speed or 200
     self.state = "alive"
-    self.states = {
-        alive = {},
-        dead = {},
-        waiting = {}
-    }
     self.points = 0
     self.timer = 0
     self.next_pause = self.randomize_pause()
@@ -30,98 +25,106 @@ function Mob:load(params)
         shiny = love.audio.newSource("assets/collect_shiny.wav", "static")
     }
 
-    -- alive state methods --
-
-    function self.states.alive.update(dt)
-        self.pulse = math.fmod(self.pulse + dt*5, math.pi)
-        if self.pause_duration > 0 then
-            self.pause_duration = self.pause_duration - dt
-        else
-            self.y = self.y + self.speed * dt
-            self.next_pause = self.next_pause - dt
-
-            if self.next_pause <= 0 then
-                self.next_pause = self.next_pause + self.randomize_pause()
-                self.pause_duration = math.random(1,10)/10
-            end
-        end
-
-        if self.y > 600 then
-            self.y = 0 - self.height
-        end
-    end
-
-    function self.states.alive.draw()
-        local pulse_sin
-        if self.shiny then
-            pulse_sin = 0.8 + 0.2 * math.sin(self.pulse)
-            love.graphics.setColor(1, pulse_sin, pulse_sin, 1)
-        end
-        love.graphics.draw(self.sprite, self.x, self.y)
-        love.graphics.setColor(1, 1, 1, 1)
-    end
-
-    function self.states.alive.die()
-        if self.shiny then
-            self.timer = 1
-        else
-            self.timer = 1.5
-        end
-        self.speed = 50
-        self:set_sprite("ghost")
-        self.death_sound:play()
-        self.state = "dead"
-    end
-
-    -- dead state methods --
-
-    function self.states.dead.update(dt)
-        self.y = self.y - self.speed * dt
-        self.timer = self.timer - dt
-        if self.timer < 0 then
-            self.timer = 1
-            self.state = "waiting"
-        end
-    end
-
-    function self.states.dead.draw()
-        local blue
-        if self.shiny then
-            blue = .6
-        else
-            blue = 1
-        end
-        love.graphics.setColor(1, 1, blue, math.min(1, 2 * self.timer))
-        love.graphics.draw(self.sprite, self.x, self.y)
-        love.graphics.setColor(1, 1, 1, 1)
-    end
-
-    function self.states.dead.die() end
-
-    -- waiting state methods --
-
-    function self.states.waiting.update(dt)
-        self.timer = self.timer - dt
-        if self.timer < 0 then
-            self:respawn()
-        end
-    end
-
-    function self.states.waiting.draw()
-    end
-
-    function self.states.waiting.die()
-    end
-
     return self
 end
 
+-- states --
+
+Mob.alive = {}
+Mob.dead = {}
+Mob.waiting = {}
+
+-- alive state methods --
+
+function Mob.alive:update(dt)
+    self.pulse = math.fmod(self.pulse + dt*5, math.pi)
+    if self.pause_duration > 0 then
+        self.pause_duration = self.pause_duration - dt
+    else
+        self.y = self.y + self.speed * dt
+        self.next_pause = self.next_pause - dt
+
+        if self.next_pause <= 0 then
+            self.next_pause = self.next_pause + self.randomize_pause()
+            self.pause_duration = math.random(1,10)/10
+        end
+    end
+
+    if self.y > 600 then
+        self.y = -self.height
+    end
+end
+
+function Mob.alive:draw()
+    local pulse_sin
+    if self.shiny then
+        pulse_sin = 0.8 + 0.2 * math.sin(self.pulse)
+        love.graphics.setColor(1, pulse_sin, pulse_sin, 1)
+    end
+    love.graphics.draw(self.sprite, self.x, self.y)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function Mob.alive:die()
+    if self.shiny then
+        self.timer = 1
+    else
+        self.timer = 1.5
+    end
+    self.speed = 50
+    self:set_sprite("ghost")
+    self.death_sound:play()
+    self.state = "dead"
+end
+
+-- dead state methods --
+
+function Mob.dead:update(dt)
+    self.y = self.y - self.speed * dt
+    self.timer = self.timer - dt
+    if self.timer < 0 then
+        self.timer = 1
+        self.state = "waiting"
+    end
+end
+
+function Mob.dead:draw()
+    local blue
+    if self.shiny then
+        blue = .6
+    else
+        blue = 1
+    end
+    love.graphics.setColor(1, 1, blue, math.min(1, 2 * self.timer))
+    love.graphics.draw(self.sprite, self.x, self.y)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function Mob.dead.die() end
+
+-- waiting state methods --
+
+function Mob.waiting:update(dt)
+    self.timer = self.timer - dt
+    if self.timer < 0 then
+        self:respawn()
+    end
+end
+
+function Mob.waiting.draw()
+end
+
+function Mob.waiting.die()
+end
+
+---
+
 function Mob:update(dt)
-    self.states[self.state].update(dt)
+    Mob[self.state].update(self, dt)
 end
 
 function Mob:draw()
-    self.states[self.state].draw()
+    Mob[self.state].draw(self)
 end
 
 function Mob:collide(obj, source)
@@ -134,7 +137,7 @@ function Mob:collide(obj, source)
 end
 
 function Mob:die()
-    self.states[self.state].die()
+    Mob[self.state].die(self)
 end
 
 function Mob:respawn()
